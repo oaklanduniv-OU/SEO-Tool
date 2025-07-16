@@ -89,6 +89,5 @@ def walk_and_average_scores(root_path, base_path=None, limit=None, offset=0, com
 
 if __name__ == "__main__":
     # If this script is run directly (e.g., for testing), it will default to the full reports root.
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    REPORTS_ROOT = os.path.join(BASE_DIR, '..', 'templates', 'lighthouse_reports')
+    REPORTS_ROOT = r"G:\My Drive\Work\2025\04\siteCheckerHTML\project\templates\lighthouse_reports"
     print(walk_and_average_scores(REPORTS_ROOT))

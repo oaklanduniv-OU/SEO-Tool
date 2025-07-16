@@ -153,7 +153,7 @@ def run_lighthouse(url):
 
 
 # Crawl entire sitemap
-def crawlSitemap(sitemap_path=None, max_workers=1):
+def crawlSitemap(sitemap_path=None, max_workers=4):
     
     print("Constructed sitemap path:", sitemap_path)
     if sitemap_path is None:
