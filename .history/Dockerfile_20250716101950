@@ -1,0 +1,38 @@
+# Use Node.js with Chrome for Lighthouse
+FROM node:20-slim
+
+# Install Python and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv && \
+    apt-get clean
+    
+# Add system dependencies
+RUN apt-get update && \
+    apt-get install -y wget curl unzip gnupg \
+                       chromium-browser \
+                       python3 python3-pip python3-venv \
+                       nodejs npm && \
+    apt-get clean
+
+# Set Chrome path so Lighthouse can find it
+ENV CHROME_PATH=/usr/bin/chromium-browser
+
+# Optional but helpful in headless environments
+ENV LIGHTHOUSE_CHROMIUM_PATH=/usr/bin/chromium-browser
+# Install Lighthouse CLI
+RUN npm install -g lighthouse
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files into container
+COPY project/ .
+
+# Install Python dependencies (fix is here ⬇)
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+
+# Expose port for Render
+EXPOSE 10000
+
+# Run the Flask app with Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]

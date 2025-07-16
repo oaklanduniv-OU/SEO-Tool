@@ -126,10 +126,7 @@ def run_lighthouse(url):
 
     command = f'lighthouse "{url}" --output html --output-path "{report_path}" --quiet --chrome-flags="--headless" --only-categories=seo,accessibility,best-practices'
     try:
-        env = os.environ.copy()
-env["CHROME_PATH"] = "/usr/bin/chromium"
-
-subprocess.run(command, shell=True, check=True, env=env)
+        subprocess.run(command, shell=True, check=True)
 
         # Inject the script only if it's a first-level page
         path_parts = urlparse(url).path.strip('/').split('/')
