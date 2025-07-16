@@ -1,0 +1,93 @@
+import os
+import json
+import re
+from bs4 import BeautifulSoup
+
+# The root path is now dynamic and passed into the function instead of being hardcoded.
+def extract_scores_from_html(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        html = f.read()
+
+    # Use regex to extract the JSON from the script tag
+    match = re.search(r'window\.__LIGHTHOUSE_JSON__\s*=\s*(\{.*?\});', html, re.DOTALL)
+    if not match:
+        return {}
+
+    try:
+        lighthouse_json = json.loads(match.group(1))
+    except json.JSONDecodeError:
+        return {}
+
+    # Pull out categories (these keys vary slightly by version, so adjust as needed)
+    scores = {}
+    if 'categories' in lighthouse_json:
+        for key, category in lighthouse_json['categories'].items():
+            scores[key] = category.get('score', 0)
+    else:
+        # fallback: average scores from audits
+        audit_scores = [
+            v.get('score') for v in lighthouse_json.get('audits', {}).values()
+            if isinstance(v.get('score'), (int, float))
+        ]
+        if audit_scores:
+            scores['average'] = sum(audit_scores) / len(audit_scores)
+
+    return scores
+
+# `root_path` is now dynamically set based on the subpath provided by Flask
+def walk_and_average_scores(root_path, base_path=None, limit=None, offset=0, compute_average=True):
+    if base_path is None:
+        base_path = root_path
+
+    all_scores = []
+    per_page_scores = []
+    total_found = 0
+    total_skipped = 0
+
+    def limited_index_files(root_path):
+        for root, dirs, files in os.walk(root_path):
+            for file in files:
+                if file == "index.html":
+                    yield os.path.join(root, file)
+
+    for full_path in limited_index_files(root_path):
+        if total_skipped < offset:
+            total_skipped += 1
+            continue
+
+        if limit is not None and len(per_page_scores) >= limit:
+            break
+
+        scores = extract_scores_from_html(full_path)
+        if scores:
+            rel_path = os.path.relpath(full_path, base_path).replace("\\", "/")
+            if compute_average:
+                all_scores.append(scores)
+
+            per_page_scores.append({
+                "path": rel_path,
+                "scores": scores
+            })
+
+        total_found += 1
+
+    averaged = {}
+    if compute_average and all_scores:
+        keys = all_scores[0].keys()
+        for key in keys:
+            values = [s[key] for s in all_scores if key in s]
+            averaged[key] = round(sum(values) / len(values), 2) if values else 0
+            
+    print(f"[DEBUG] Skipped: {total_skipped}, Loaded: {len(per_page_scores)}, Limit: {limit}, Offset: {offset}")
+
+    return {
+        "average": averaged if compute_average else None,
+        "pages": per_page_scores
+    }
+
+
+
+if __name__ == "__main__":
+    # If this script is run directly (e.g., for testing), it will default to the full reports root.
+    REPORTS_ROOT = r"G:\My Drive\Work\2025\04\siteCheckerHTML\project\templates\lighthouse_reports"
+    print(walk_and_average_scores(REPORTS_ROOT))

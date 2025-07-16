@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lighthouse Report - Average Scores</title>
+
+  <link rel="stylesheet"  href="{{ url_for('static', filename='css/style.css') }}" />
+  <link id="theme-link" rel="stylesheet" href="/static/css/dark-mode.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  {% include 'includes/header.html' %}
+  <header>
+  <h1>Report Generation</h1>
+</header>
+
+
+  
+  <!-- Tab navigation -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('sitewide')">Sitewide SEO Report</div>
+    <div class="tab" onclick="showTab('section')">Section SEO Report</div>
+    <div class="tab" onclick="showTab('single-page')">Single Page SEO Report</div>
+    <div class="tab" onclick="showTab('link-checker')">Broken Link Checker</div>
+  </div>
+
+<!-- Sitewide Report Tab Content -->
+<div class="tab-content active" id="sitewide">
+  <h3>Sitewide Report</h3>
+  <button id="run-sitewide-btn" onclick="runScript('sitewide_report')">Run Sitewide Report</button>
+
+  <!-- Sitemap File Upload Section -->
+  <div id="sitemap-upload">
+    <h4>Upload Sitemap XML</h4>
+    <form id="sitemap-form" enctype="multipart/form-data">
+      <label for="sitemap-file">Choose Sitemap XML File:</label>
+      <input type="file" id="sitemap-file" name="sitemap-file" accept=".xml">
+      <button type="submit">Upload Sitemap</button>
+    </form>
+    <p id="upload-feedback" style="color: lightgray;"></p>
+  </div>
+</div>
+
+
+  <!-- Tab content for Section Report -->
+  <div class="tab-content" id="section">
+    <label class="section-label" for="section-select">Choose a section to crawl:</label>
+    <select id="section-select" onchange="toggleCustomInput()">
+      <option value="">-- Select a Section --</option>
+      {% for dir in level_1_dirs %}
+        <option value="{{ dir }}">{{ dir }}</option>
+      {% endfor %}
+      <option value="custom">Custom</option>
+    </select>
+
+    <!-- Input field for custom section -->
+    <div id="custom-section-input">
+      <label for="custom-section">Enter custom section:</label>
+      <input type="text" id="custom-section" name="custom-section">
+    </div>
+
+    <button id="run-section-btn" onclick="runSectionReport()">Run Section Report</button>
+  </div>
+
+  <!-- Tab content for Single Page Report -->
+  <div class="tab-content" id="single-page">
+    <label for="custom-url">Enter URL for single page scan:</label>
+    <input type="url" id="custom-url" name="custom-url" placeholder="https://www.oakland.edu/grad">
+
+    <button id="run-single-page-btn" onclick="runSinglePageReport()">Run Single Page Report</button>
+  </div>
+
+  <!-- Tab content for Link Checker (currently does nothing) -->
+  <div class="tab-content" id="link-checker">
+    <button id="run-link-checker-btn" onclick="alert('Link Checker not implemented yet.')">Run Link Checker</button>
+  </div>
+
+  <script>
+    // Function to switch between tabs
+    function showTab(tabName) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(tab => tab.classList.remove('active'));
+
+      // Deactivate all tabs
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+
+      // Activate the selected tab
+      document.getElementById(tabName).classList.add('active');
+      const activeTab = document.querySelector(`.tab[onclick="showTab('${tabName}')"]`);
+      activeTab.classList.add('active');
+    }
+
+    // Function to toggle visibility of the custom section input
+    function toggleCustomInput() {
+      const selectBox = document.getElementById('section-select');
+      const customInputDiv = document.getElementById('custom-section-input');
+      const customUrlDiv = document.getElementById('custom-url-input');
+
+      if (selectBox.value === 'custom') {
+        customInputDiv.style.display = 'block'; // Show the custom input field for section
+  
+      } else {
+        customInputDiv.style.display = 'none'; // Hide the custom input field for section
+      }
+    }
+
+    // Function to handle the single-page report request
+    function runSinglePageReport() {
+      const urlInput = document.getElementById('custom-url').value.trim(); // Get the entered URL
+
+      if (!urlInput) {
+        alert("Please enter a valid URL for the single-page scan.");
+        return;
+      }
+
+      // Create FormData object to send data via POST request
+      const formData = new FormData();
+      formData.append('action', 'single_page_report');
+      formData.append('url', urlInput); // Append the entered URL
+
+      // Make the POST request using Fetch API
+      fetch('/run-script', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Show an alert with the message returned from the backend
+        alert(data.message);
+      })
+      .catch(error => {
+        // Handle errors if any
+        alert("There was an error: " + error.message);
+      });
+    }
+
+    // Function for running section report
+    function runSectionReport() {
+      const sectionSelect = document.getElementById("section-select");
+      let section = sectionSelect.value; // Get the selected section
+
+      if (section === "custom") {
+        section = document.getElementById("custom-section").value.trim(); // Get the custom section value
+        if (!section) {
+          alert("Please enter a valid custom section.");
+          return;
+        }
+      }
+
+      // Create FormData object to send data via POST request
+      const formData = new FormData();
+      formData.append('action', 'section_report'); // Action for section report
+      formData.append('section', section); // Append selected section
+
+      // Make the POST request using Fetch API
+      fetch('/run-script', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Show an alert with the message returned from the backend
+        alert(data.message);
+      })
+      .catch(error => {
+        // Handle errors if any
+        alert("There was an error: " + error.message);
+      });
+    }
+
+    // Function for the sitewide report button
+    function runScript(action) {
+      const formData = new FormData();
+      formData.append('action', action);
+
+      // Make the POST request using Fetch API
+      fetch('/run-script', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Show an alert with the message returned from the backend
+        
+        alert(data.message);
+      })
+      .catch(error => {
+        // Handle errors if any
+        alert("There was an error: " + error.message);
+      });
+    }
+  </script>
+
+  
+
+
+  <script>
+    // Handle sitemap file upload using AJAX
+    document.getElementById('sitemap-form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+  
+      const formData = new FormData();
+      const sitemapFile = document.getElementById('sitemap-file').files[0];
+      
+      if (!sitemapFile) {
+        document.getElementById('upload-feedback').innerText = "Please select a sitemap XML file to upload.";
+        return;
+      }
+      
+      formData.append('sitemap-file', sitemapFile);  // Add the file to the FormData object
+      
+      // Make the POST request using Fetch API
+      fetch('/upload-sitemap', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('upload-feedback').innerText = data.message;
+      })
+      .catch(error => {
+        document.getElementById('upload-feedback').innerText = "Error: " + error.message;
+      });
+    });
+  </script>
+  <script src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
+</body>
+</html>
