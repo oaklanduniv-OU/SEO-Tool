@@ -85,8 +85,7 @@ def get_index_html_count_with_expiration(reports_root):
 @api.route('/api/average-scores/<path:subpath>', defaults={'page': 1})
 @api.route('/api/average-scores/<path:subpath>/<int:page>')
 def get_average_scores(subpath, page):
-    report_dir = os.path.join(app.root_path, 'templates', 'lighthouse_reports')
-
+    report_dir = r"G:\My Drive\Work\2025\04\siteCheckerHTML\project\templates\lighthouse_reports"
 
     if subpath:
         reports_root = os.path.join(report_dir, subpath.strip('/'))
