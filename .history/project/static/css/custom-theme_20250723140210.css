@@ -1,0 +1,107 @@
+:root {
+    --accent-color: #877148;
+    --accent-hover: #a0854c;
+  }
+  
+  /* ---------- SHARED ELEMENTS ---------- */
+  button:hover,
+  #pagination button:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  .page-score-row a {
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+  
+  .page-score-row a:hover {
+    text-decoration: underline;
+    color: var(--accent-hover);
+  }
+  
+  .lh-gauge__percentage,
+  .lh-gauge__label {
+    color: var(--accent-color) !important;
+    font-weight: bold;
+  }
+  
+  .lh-gauge-arc {
+    stroke: var(--accent-color) !important;
+  }
+  
+  #pagination input {
+    background-color: inherit;
+    color: inherit;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 2rem;
+  }
+  
+  /* Optional: emphasize active tabs */
+  .tab.active {
+    background-color: var(--accent-color) !important;
+    color: white !important;
+  }
+  
+  /* ---------- LIGHT THEME OVERRIDES ---------- */
+  body:not(.dark-theme) {
+    background-color: #ffffff;
+    color: #333333;
+  }
+  
+  body:not(.dark-theme) header,
+  body:not(.dark-theme) nav a {
+    background-color: #f0f0f0;
+    color: #333333;
+  }
+  
+  body:not(.dark-theme) .box.total {
+    background-color: #eeeeee;
+  }
+  
+  body:not(.dark-theme) .box.broken {
+    background-color: #d36f6f;
+    color: #ffffff;
+  }
+  
+  /* ---------- DARK THEME OVERRIDES ---------- */
+  body.dark-theme {
+    background-color: #1e1e1e;
+    color: #e5e5e5;
+  }
+  
+  body.dark-theme header,
+  body.dark-theme nav a {
+    background-color: #243447;
+    color: #ffffff;
+  }
+  
+  body.dark-theme .box.total {
+    background-color: #3a3a3a;
+  }
+  
+  body.dark-theme .box.broken {
+    background-color: #7a2a2a;
+    color: #ffd6d6;
+  }
+  
+  /* Optional nav hover across both themes */
+  nav a:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  /* Input styling across both themes */
+  input[type="text"],
+  input[type="url"],
+  select {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    width: 20%;
+    background-color: inherit;
+    color: inherit;
+    border: 1px solid #aaa;
+  }
+  
