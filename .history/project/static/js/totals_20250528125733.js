@@ -296,8 +296,8 @@ scoresRow.appendChild(createGauge(blTitle, lcScore.toFixed(2), "/#"));
         pageInput.min = 1;
         pageInput.max = totalPages;
         pageInput.style = `
-            background-color: #877148;
-            color: white;
+            background-color: #444;
+            color: #f0f0f0;
             border-radius: 5px;
             border: 1px solid #555;
             cursor: pointer;

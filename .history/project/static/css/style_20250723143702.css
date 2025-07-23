@@ -1,0 +1,368 @@
+/* Base layout */
+body {
+  font-family: Arial, sans-serif;
+  background: #1e1e1e; /* Slightly lighter than pure black */
+  color: #e5e5e5;       /* Softer white */
+  margin: 0;
+  padding: 0 20px;
+}
+
+/* Header styling */
+header {
+  background: #243447;  /* Dark navy blue */
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+h1, h2 {
+  margin-bottom: 10px;
+  color: #f0f0f0;
+}
+
+/* Summary boxes */
+.summary-boxes {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.box {
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  flex: 1 1 150px;
+  color: #f2f2f2;
+}
+
+.box.total {
+  background: #3a3a3a;
+}
+
+
+.box.broken {
+  background: #7a2a2a;
+  color: #ffd6d6;
+}
+
+/* Collapsible link sections */
+.link-item {
+  margin-bottom: 15px;
+  border-radius: 6px;
+  padding: 10px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+}
+
+.link-item[open] {
+  border-color: #5393ff;
+}
+
+.link-item.valid {
+  border-left: 5px solid #66bb6a;
+}
+
+.link-item.broken {
+  border-left: 5px solid #e57373;
+}
+
+.link-url {
+  font-weight: bold;
+  color: #add8ff;
+}
+
+.status-label {
+  font-weight: bold;
+  color: #e0b4cc;
+  margin-left: 10px;
+  float: right;
+}
+
+/* Details inside collapsible */
+.link-details {
+  margin-top: 10px;
+  padding-left: 10px;
+  font-size: 0.95rem;
+  color: #cccccc;
+}
+
+summary {
+  cursor: pointer;
+  list-style: none;
+  outline: none;
+}
+
+/* Grouped broken links */
+.link-item.grouped {
+  border-left: 5px solid #f77;
+}
+
+/* Nested child links */
+.child-link {
+  margin-bottom: 20px;
+  padding-left: 10px;
+}
+
+.child-link hr {
+  border: none;
+  border-top: 1px solid #555;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.child-link a {
+  color: #9de0db;
+  text-decoration: none;
+}
+
+.child-link a:hover {
+  text-decoration: underline;
+}
+
+/* Sort dropdown styling */
+#sort-container {
+  margin: 20px 0;
+  font-family: Arial, sans-serif;
+}
+
+#sort-select {
+  padding: 5px 10px;
+  font-size: 14px;
+  background-color: #333;
+  color: #f0f0f0;
+  border: 1px solid #555;
+}
+
+.link-url,
+.link-details,
+.child-link {
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+summary {
+  display: block;
+  max-width: 100%;
+}
+
+#search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#search-container input {
+  padding: 8px;
+  background-color: #2f2f2f;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.search-group, .search-button-group{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-group input {
+  flex: 1;
+}
+
+#search-btn, #reset-btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #444;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#reset-btn:hover, #search-btn:hover {
+  background-color: #555;
+}
+
+
+
+
+/*Style for the generate-reports file*/
+ /* Base layout */
+ body {
+  font-family: Arial, sans-serif;
+  background: #1e1e1e; /* Slightly lighter than pure black */
+  color: #e5e5e5;       /* Softer white */
+  margin: 0;
+  padding: 0 20px;
+}
+
+/* Header styling */
+header {
+  background: #243447;  /* Dark navy blue */
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+h1, h2 {
+  margin-bottom: 10px;
+  color: #f0f0f0;
+}
+
+/* Tab styles */
+.tabs {
+  display: flex;
+  cursor: pointer;
+  margin-bottom: 1em;
+}
+.tab {
+  padding: 10px 20px;
+  background-color: #333;
+  margin-right: 10px;
+  border-radius: 5px;
+  color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+.tab.active {
+  background-color: #877148;
+  color: white;
+}
+
+/* Tab content styles */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+button {
+  background-color: #444;
+  color: #f0f0f0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #555;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+button:hover {
+  background-color: #555;
+}
+
+/* Input fields */
+input[type="url"],
+input[type="text"],
+#sort-select {
+  background-color: #333;
+  color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  width: 20%;
+}
+
+/* Custom input field for Section Report */
+#custom-section-input,
+#custom-url-input {
+  display: none; /* Hidden by default */
+}
+
+/* Section specific styles */
+.section-label {
+  margin-bottom: 5px;
+}
+
+
+/* Style for the navigation menu */
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav li {
+  display: inline-block;
+  position: relative;
+}
+
+nav a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #fff;
+  background-color: #333;
+}
+
+nav li:hover > a {
+  background-color: #555;
+}
+
+/* Style for the submenu */
+nav .submenu ul {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background-color: #333;
+  min-width: 200px;
+}
+
+nav .submenu:hover > ul {
+  display: block;
+}
+
+nav .submenu ul li {
+  display: block;
+}
+
+nav .submenu ul li a {
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+}
+
+nav .submenu ul li a:hover {
+  background-color: #555;
+}
+
+#theme-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.3s ease; /* Smooth color transition */
+}
+
+/* Optional: Hover effect for lightbulb */
+#theme-toggle-btn:hover {
+  color: #ffd700; /* Change color on hover */
+}
+
+header{
+  margin-bottom:1rem;
+}
+
+nav{
+  padding-top:1rem;
+}
+
+
+#pageLevel-select{
+  width:10%;
+}
+
+
+
