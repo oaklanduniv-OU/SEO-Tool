@@ -31,10 +31,14 @@ jobs:
             docker run --rm -v ${{ github.workspace }}/project:/app seo-reporter python3 scripts/GenerateSEOReports.py section_report ${{ github.event.inputs.value }}
           fi
 
+      - name: Configure git for push
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/arkomeshak-OU/SEO-Tool.git
+
       - name: Commit and push updated reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add project/templates/lighthouse_reports/
           git commit -m "📄 Manual ${GITHUB_EVENT_INPUTS_MODE} report for '${GITHUB_EVENT_INPUTS_VALUE}'" || echo "No changes to commit"
-          git push
+          git push origin main
