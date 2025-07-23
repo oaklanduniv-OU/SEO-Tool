@@ -261,7 +261,7 @@
             const percent = (data.progress.current_step / data.progress.total_steps) * 100;
             console.log(percent)
             progressBar.style.width = percent + "%";
-            progressStep.innerText = `Step ${data.progress.current_step} of ${data.progress.total_steps}: ${data.progress.current_step_name}`;
+            progressBar.innerText = `Step ${data.progress.current_step} of ${data.progress.total_steps}: ${data.progress.current_step_name}`;
           } else {
             // Hide progress bar if no progress info yet
             progressContainer.style.display = "none";
