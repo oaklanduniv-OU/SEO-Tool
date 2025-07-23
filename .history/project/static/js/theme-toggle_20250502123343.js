@@ -13,10 +13,10 @@ if (savedTheme) {
     toggleIcon.style.color = '#333'; // Lightbulb color for light mode
   }
 } else {
-  // Default theme (light mode)
-  themeLink.setAttribute('href', '/static/css/light-mode.css');
-  //document.body.className = "dark-theme"
-  toggleIcon.style.color = '#333'; // Lightbulb color for dark mode
+  // Default theme (dark mode)
+  themeLink.setAttribute('href', '/static/css/dark-mode.css');
+  document.body.className = "dark-theme"
+  toggleIcon.style.color = '#ffcc00'; // Lightbulb color for dark mode
 
 }
 
