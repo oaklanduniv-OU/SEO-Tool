@@ -15,7 +15,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t seo-reporter .
+          docker build --no-cache -t seo-reporter .
 
       - name: Run sitewide report in container
         run: |
