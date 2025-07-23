@@ -109,85 +109,67 @@
 
     // Function to handle the single-page report request
     function runSinglePageReport() {
-  const urlInput = document.getElementById('custom-url').value.trim();
-  const loader = document.getElementById('loader');
-  const statusMsg = document.getElementById('statusMsg');
+      const urlInput = document.getElementById('custom-url').value.trim(); // Get the entered URL
 
-  if (!urlInput) {
-    alert("Please enter a valid URL for the single-page scan.");
-    return;
-  }
+      if (!urlInput) {
+        alert("Please enter a valid URL for the single-page scan.");
+        return;
+      }
 
-  const formData = new FormData();
-  formData.append('action', 'single_page_report');
-  formData.append('url', urlInput);
+      // Create FormData object to send data via POST request
+      const formData = new FormData();
+      formData.append('action', 'single_page_report');
+      formData.append('url', urlInput); // Append the entered URL
 
-  loader.style.display = 'block';
-  statusMsg.innerText = "";
-
-  fetch('/run-script', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    statusMsg.innerText = data.message;
-
-    if (data.message.includes("successfully")) {
-      pollStatus("single_page", urlInput);
-    } else {
-      loader.style.display = "none";
+      // Make the POST request using Fetch API
+      fetch('/run-script', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Show an alert with the message returned from the backend
+        alert(data.message);
+      })
+      .catch(error => {
+        // Handle errors if any
+        alert("There was an error: " + error.message);
+      });
     }
-  })
-  .catch(error => {
-    loader.style.display = "none";
-    alert("There was an error: " + error.message);
-  });
-}
-
 
     // Function for running section report
     function runSectionReport() {
-  const sectionSelect = document.getElementById("section-select");
-  let section = sectionSelect.value.trim();
-  const loader = document.getElementById('loader');
-  const statusMsg = document.getElementById('statusMsg');
+      const sectionSelect = document.getElementById("section-select");
+      let section = sectionSelect.value; // Get the selected section
 
-  if (section === "custom") {
-    section = document.getElementById("custom-section").value.trim();
-    if (!section) {
-      alert("Please enter a valid custom section.");
-      return;
+      if (section === "custom") {
+        section = document.getElementById("custom-section").value.trim(); // Get the custom section value
+        if (!section) {
+          alert("Please enter a valid custom section.");
+          return;
+        }
+      }
+
+      // Create FormData object to send data via POST request
+      const formData = new FormData();
+      formData.append('action', 'section_report'); // Action for section report
+      formData.append('section', section); // Append selected section
+
+      // Make the POST request using Fetch API
+      fetch('/run-script', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Show an alert with the message returned from the backend
+        alert(data.message);
+      })
+      .catch(error => {
+        // Handle errors if any
+        alert("There was an error: " + error.message);
+      });
     }
-  }
-
-  const formData = new FormData();
-  formData.append('action', 'section_report');
-  formData.append('section', section);
-
-  loader.style.display = 'block';
-  statusMsg.innerText = "";
-
-  fetch('/run-script', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    statusMsg.innerText = data.message;
-
-    if (data.message.includes("successfully")) {
-      pollStatus("section", section);
-    } else {
-      loader.style.display = "none";
-    }
-  })
-  .catch(error => {
-    loader.style.display = "none";
-    alert("There was an error: " + error.message);
-  });
-}
-
 
     // Function for the sitewide report button
     function runScript(action) {
@@ -210,43 +192,6 @@
         alert("There was an error: " + error.message);
       });
     }
-
-
-
-
-
-    function pollStatus(mode, value) {
-  const statusMsg = document.getElementById("statusMsg");
-  const loader = document.getElementById("loader");
-
-  const interval = setInterval(() => {
-    fetch(`/workflow-status?mode=${mode}&value=${encodeURIComponent(value)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "completed") {
-          clearInterval(interval);
-          loader.style.display = "none";
-
-          if (data.conclusion === "success") {
-            const reportPath = mode === "section"
-              ? `/reports/${value}`
-              : `/reports/${new URL(value).pathname.replace(/^\/|\/$/g, '')}`;
-
-            statusMsg.innerHTML = `✅ Report complete. <a href="${reportPath}" target="_blank">View report</a>`;
-          } else {
-            statusMsg.innerText = "❌ Report failed.";
-          }
-        } else if (data.status === "in_progress") {
-          statusMsg.innerText = `⏳ Report is in progress...`;
-        } else if (data.status === "queued") {
-          statusMsg.innerText = `🕓 Report is in queue...`;
-        } else {
-          statusMsg.innerText = `⚠️ No workflow run found yet...`;
-        }
-      });
-  }, 10000); // poll every 10s
-}
-
   </script>
 
   
