@@ -5,7 +5,6 @@ import sys
 from werkzeug.utils import secure_filename
 import time
 from functools import lru_cache
-import requests
 
 import math
 
@@ -153,35 +152,6 @@ def get_average_scores(subpath, page):
 app.register_blueprint(api)
 
 
-GITHUB_REPO = "arkomeshak-OU/SEO-Tool"  # <-- Replace with your actual GitHub repo
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # From Render's env variables
-print(f"GITHUB_TOKEN is {'set' if GITHUB_TOKEN else 'NOT SET'}")
-GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows"
-
-def trigger_workflow(workflow_filename, inputs=None):
-    headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json"
-    }
-
-    data = {
-        "ref": "main"
-    }
-
-    if inputs:
-        data["inputs"] = inputs
-
-    response = requests.post(
-        f"{GITHUB_API_URL}/{workflow_filename}/dispatches",
-        json=data,
-        headers=headers
-    )
-
-    if response.status_code == 204:
-        return True, "Workflow triggered successfully"
-    else:
-        return False, f"Failed to trigger workflow: {response.text}"
-
 @app.route('/run-script', methods=['POST'])
 def run_script():
     action = request.form.get('action')
@@ -189,19 +159,19 @@ def run_script():
     url = request.form.get('url')
 
     if action == 'sitewide_report':
-        success, message = trigger_workflow("manual-reports.yml")  # Your .yml filename
+        success, message = trigger_workflow("sitewide-report.yml")  # Your .yml filename
         return jsonify({"message": message}), (200 if success else 500)
 
     elif action == 'section_report':
         if not section:
             return jsonify({"message": "No section selected"}), 400
-        success, message = trigger_workflow("manual-reports.yml", inputs={"mode": "section", "value": section})
+        success, message = trigger_workflow("section-report.yml", inputs={"section": section})
         return jsonify({"message": message}), (200 if success else 500)
 
     elif action == 'single_page_report':
         if not url:
             return jsonify({"message": "No URL provided"}), 400
-        success, message = trigger_workflow("manual-reports.yml", inputs={"mode": "single_page", "value": url})
+        success, message = trigger_workflow("single-page-report.yml", inputs={"url": url})
         return jsonify({"message": message}), (200 if success else 500)
 
     else:

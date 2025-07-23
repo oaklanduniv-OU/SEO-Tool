@@ -8,7 +8,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import requests  # Add this at the top with your other imports
 import re
 from flask import render_template_string
-import sys
 
 
 def log_failed_url(url, error):

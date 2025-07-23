@@ -8,7 +8,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import requests  # Add this at the top with your other imports
 import re
 from flask import render_template_string
-import sys
 
 
 def log_failed_url(url, error):
@@ -214,25 +213,18 @@ def url_is_valid(url):
         return False
 
 
+# Example usage
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        mode = sys.argv[1]
-
-        if mode == 'sitewide_report':
-            crawlSitemap()
-        elif mode == 'single_page_report':
-            if len(sys.argv) > 2:
-                url = sys.argv[2]
-                crawlSinglePage(url)
+    if __name__ == "__main__":
+        if len(sys.argv) > 1:
+            action = sys.argv[1]
+            if action == 'sitewide_report':
+                crawlSitemap()
+            elif action == 'single_page_report':
+                crawlSinglePage(sys.argv[2])
+            elif action == 'section_report':
+                crawlSection(sys.argv[2])
             else:
-                print("❌ Missing URL argument for single_page_report")
-        elif mode == 'section_report':
-            if len(sys.argv) > 2:
-                section = sys.argv[2]
-                crawlSection(section)
-            else:
-                print("❌ Missing section argument for section_report")
-        else:
-            print(f"❌ Unknown mode: {mode}")
+                print(f"❌ Unknown action: {action}")
     else:
-        print("❌ No mode specified")
+        print("❌ No action specified")

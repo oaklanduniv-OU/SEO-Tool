@@ -1,0 +1,44 @@
+# .github/workflows/manual-reports.yml
+name: Manual Section/Single Page Reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'What to run (single_page or section)'
+        required: true
+        default: 'section'
+      value:
+        description: 'URL or Section Path'
+        required: true
+
+jobs:
+  run-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (no cache)
+        run: |
+          docker build --no-cache -t seo-reporter .
+
+      - name: Run report
+        run: |
+          if [ "${{ github.event.inputs.mode }}" = "single_page" ]; then
+            docker run --rm -v ${{ github.workspace }}/project:/app seo-reporter python3 scripts/GenerateSEOReports.py single_page_report ${{ github.event.inputs.value }}
+          else
+            docker run --rm -v ${{ github.workspace }}/project:/app seo-reporter python3 scripts/GenerateSEOReports.py section_report ${{ github.event.inputs.value }}
+          fi
+
+      - name: Configure git for push
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/arkomeshak-OU/SEO-Tool.git
+
+      - name: Commit and push updated reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add project/templates/lighthouse_reports/
+          git commit -m "📄 Manual ${GITHUB_EVENT_INPUTS_MODE} report for '${GITHUB_EVENT_INPUTS_VALUE}'" || echo "No changes to commit"
+          git push origin main

@@ -195,13 +195,13 @@ def run_script():
     elif action == 'section_report':
         if not section:
             return jsonify({"message": "No section selected"}), 400
-        success, message = trigger_workflow("manual-reports.yml", inputs={"mode": "section", "value": section})
+        success, message = trigger_workflow("manual-reports.yml", inputs={"section": section})
         return jsonify({"message": message}), (200 if success else 500)
 
     elif action == 'single_page_report':
         if not url:
             return jsonify({"message": "No URL provided"}), 400
-        success, message = trigger_workflow("manual-reports.yml", inputs={"mode": "single_page", "value": url})
+        success, message = trigger_workflow("manual-reports.yml", inputs={"url": url})
         return jsonify({"message": message}), (200 if success else 500)
 
     else:

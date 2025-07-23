@@ -1,5 +1,4 @@
 import os
-import sys
 import subprocess
 import xml.etree.ElementTree as ET
 from urllib.parse import urlparse
@@ -9,7 +8,6 @@ import requests  # Add this at the top with your other imports
 import re
 from flask import render_template_string
 import sys
-
 
 def log_failed_url(url, error):
     with open("failed_urls.log", "a", encoding="utf-8") as f:
@@ -214,25 +212,18 @@ def url_is_valid(url):
         return False
 
 
+# Example usage
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        mode = sys.argv[1]
-
-        if mode == 'sitewide_report':
+        action = sys.argv[1]
+        
+        if action == 'sitewide_report':
             crawlSitemap()
-        elif mode == 'single_page_report':
-            if len(sys.argv) > 2:
-                url = sys.argv[2]
-                crawlSinglePage(url)
-            else:
-                print("❌ Missing URL argument for single_page_report")
-        elif mode == 'section_report':
-            if len(sys.argv) > 2:
-                section = sys.argv[2]
-                crawlSection(section)
-            else:
-                print("❌ Missing section argument for section_report")
+        elif action == 'section_report':
+            crawlSection("/eri")
+        elif action == 'single_page_report':
+            crawlSinglePage("https://www.oakland.edu/housing/")
         else:
-            print(f"❌ Unknown mode: {mode}")
+            print(f"❌ Unknown action: {action}")
     else:
-        print("❌ No mode specified")
+        print("❌ No action specified")
