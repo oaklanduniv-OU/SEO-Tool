@@ -1,23 +1,23 @@
 /* Base layout */
 body {
     font-family: Arial, sans-serif;
-    background: #1e1e1e; /* Slightly lighter than pure black */
-    color: #e5e5e5;       /* Softer white */
+    background: #ffffff; /* Light background */
+    color: #333333;      /* Dark text */
     margin: 0;
     padding: 0 20px;
   }
   
   /* Header styling */
   header {
-    background: #243447;  /* Dark navy blue */
-    color: white;
+    background: #f0f0f0;  /* Light grey background */
+    color: #333333;
     padding: 20px;
     text-align: center;
   }
   
   h1, h2 {
     margin-bottom: 10px;
-    color: #f0f0f0;
+    color: #333333;
   }
   
   /* Summary boxes */
@@ -33,16 +33,16 @@ body {
     border-radius: 8px;
     font-size: 1.1rem;
     flex: 1 1 150px;
-    color: #f2f2f2;
+    color: #333333;
   }
   
   .box.total {
-    background: #3a3a3a;
+    background: #e0e0e0;
   }
   
   .box.broken {
-    background: #7a2a2a;
-    color: #ffd6d6;
+    background: #d36f6f;
+    color: #fff;
   }
   
   /* Collapsible link sections */
@@ -50,13 +50,13 @@ body {
     margin-bottom: 15px;
     border-radius: 6px;
     padding: 10px;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
+    background-color: #e0e0e0; /* Light background for items */
+    border: 1px solid #ccc;
     transition: all 0.3s ease;
   }
   
   .link-item[open] {
-    border-color: #877148;
+    border-color: #5393ff;
   }
   
   .link-item.valid {
@@ -69,23 +69,23 @@ body {
   
   .link-url {
     font-weight: bold;
-    color: #add8ff;
+    color: #007bff; /* Blue links */
   }
   
   .status-label {
     font-weight: bold;
-    color: #e0b4cc;
+    color: #ff4081; /* Pink status */
     margin-left: 10px;
     float: right;
   }
   
-  /* Further dark mode styles (tabs, buttons, links, etc.) */
+  /* Further light mode styles (tabs, buttons, links, etc.) */
   .tab {
     padding: 10px 20px;
-    background-color: #333;
+    background-color: #f0f0f0;
     margin-right: 10px;
     border-radius: 5px;
-    color: #f0f0f0;
+    color: #333;
     transition: background-color 0.3s ease;
   }
   
@@ -101,10 +101,10 @@ body {
   
   /* Input fields */
   input[type="url"], input[type="text"], select {
-    background-color: #333;
-    color: #f0f0f0;
+    background-color: #fff;
+    color: #333;
     padding: 10px;
-    border: 1px solid #555;
+    border: 1px solid #ccc;
     border-radius: 4px;
     margin-bottom: 10px;
     width: 20%;
@@ -115,7 +115,7 @@ body {
     display: block;
     padding: 10px 15px;
     text-decoration: none;
-    color: #fff;
-    background-color: #333;
+    color: #333;
+    background-color: #f0f0f0;
   }
   
