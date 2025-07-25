@@ -1,0 +1,144 @@
+/* Base layout */
+body {
+  font-family: Arial, sans-serif;
+  background: #ffffff; /* Light background */
+  color: #333333;      /* Dark text */
+  margin: 0;
+  padding: 0 20px;
+}
+
+/* Header styling */
+header {
+  background: #877148;  /* Light grey background */
+  color: #333333;
+  padding: 20px;
+  text-align: center;
+}
+
+h1, h2 {
+  margin-bottom: 10px;
+  color: white;
+}
+
+.page-score-row  a {
+  color:black !important;
+}
+
+/* Summary boxes */
+.summary-boxes {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.box {
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  flex: 1 1 150px;
+  color: #333333;
+}
+
+.box.total {
+  background: #e0e0e0;
+}
+
+.box.broken {
+  background: #d36f6f;
+  color: #fff;
+}
+
+/* Collapsible link sections */
+.link-item {
+  margin-bottom: 15px;
+  border-radius: 6px;
+  padding: 10px;
+  background-color: #e0e0e0; /* Light background for items */
+  border: 1px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.link-item[open] {
+  border-color: #877148;
+}
+
+.link-item.valid {
+  border-left: 5px solid #66bb6a;
+}
+
+.link-item.broken {
+  border-left: 5px solid #e57373;
+}
+
+.link-url {
+  font-weight: bold;
+  color: #007bff; /* Blue links */
+}
+
+.status-label {
+  font-weight: bold;
+  color: #ff4081; /* Pink status */
+  margin-left: 10px;
+  float: right;
+}
+
+/* Further light mode styles (tabs, buttons, links, etc.) */
+.tab {
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  margin-right: 10px;
+  border-radius: 5px;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+button, #reset-btn, #search-btn {
+  background-color: #877148;
+  color: #f0f0f0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #555;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Input fields */
+input[type="url"], input[type="text"], select, #search-container input,  #sort-select{
+  background-color: #fff;
+  color: #333;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  width: 20%;
+}
+
+/* Navigation */
+nav a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+
+.lh-gauge_label{
+
+  color:black !important;
+}
+.link-url{
+  color:#877148;
+}
+.link-details{
+  color:black;
+}
+.child-link a {
+  color:black;
+  text-decoration: underline;
+}
+.child-link a:hover {
+  color:#877148;
+
+}

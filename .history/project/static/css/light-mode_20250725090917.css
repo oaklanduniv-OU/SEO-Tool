@@ -45,7 +45,7 @@ body {
   }
   
   .box.broken {
-    background: darkred;
+    background: #d36f6f;
     color: #fff;
   }
   

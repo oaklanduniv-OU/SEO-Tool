@@ -45,7 +45,7 @@ body {
   }
   
   .box.broken {
-    background: darkred;
+    background: #d36f6f;
     color: #fff;
   }
   
@@ -63,12 +63,22 @@ body {
     border-color: #877148;
   }
   
-
+  .link-item.valid {
+    border-left: 5px solid #66bb6a;
+  }
   
+  .link-item.broken {
+    border-left: 5px solid #e57373;
+  }
+  
+  .link-url {
+    font-weight: bold;
+    color: #007bff; /* Blue links */
+  }
   
   .status-label {
     font-weight: bold;
-    color: darkred; /* Pink status */
+    color: #ff4081; /* Pink status */
     margin-left: 10px;
     float: right;
   }
