@@ -209,7 +209,7 @@ def run_script():
 def workflow_status():
     mode = request.args.get('mode')
     value = request.args.get('value')
-    
+
     if not GITHUB_TOKEN:
         return jsonify({"error": "Missing GitHub token"}), 500
 
@@ -229,55 +229,71 @@ def workflow_status():
         return jsonify({"error": response.json()}), response.status_code
 
     runs = response.json().get("workflow_runs", [])
+
     if not runs:
         return jsonify({"status": "not_found"})
 
     latest_run = runs[0]
-
-    # Fetch jobs for this run to get step info
-    jobs_url = latest_run['jobs_url']
-    jobs_resp = requests.get(jobs_url, headers=headers)
-    if jobs_resp.status_code != 200:
-        return jsonify({
-            "status": latest_run["status"],
-            "conclusion": latest_run.get("conclusion"),
-            "html_url": latest_run["html_url"]
-        })
-
-    jobs_data = jobs_resp.json()
-    jobs = jobs_data.get('jobs', [])
-    
-    # Flatten all steps from all jobs into one list
-    all_steps = []
-    for job in jobs:
-        all_steps.extend(job.get('steps', []))
-
-    total_steps = len(all_steps)
-    current_step_index = 0
-
-    # Find first incomplete or in-progress step
-    for idx, step in enumerate(all_steps):
-        if step['conclusion'] is None:  # Step is running or pending
-            current_step_index = idx + 1
-            current_step_name = step['name']
-            break
-    else:
-        # If all steps have conclusion, then set current step to total
-        current_step_index = total_steps
-        current_step_name = "Finishing up"
-
     return jsonify({
-        "status": latest_run["status"],  # queued, in_progress, completed
+        "status": latest_run["status"],
         "conclusion": latest_run.get("conclusion"),
-        "html_url": latest_run["html_url"],
-        "progress": {
-            "current_step": current_step_index,
-            "total_steps": total_steps,
-            "current_step_name": current_step_name
-        }
+        "html_url": latest_run["html_url"]
     })
 
+@app.route('/workflow-progress')
+def workflow_progress():
+    if not GITHUB_TOKEN:
+        return jsonify({"error": "Missing GitHub token"}), 500
 
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json"
+    }
+
+    workflow_name = "manual-reports.yml"
+    response = requests.get(
+        f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/{workflow_name}/runs",
+        headers=headers
+    )
+
+    if response.status_code != 200:
+        return jsonify({"error": response.json()}), response.status_code
+
+    runs = response.json().get("workflow_runs", [])
+    if not runs:
+        return jsonify({"status": "not_found"})
+
+    latest_run = runs[0]
+    run_id = latest_run['id']
+
+    jobs_response = requests.get(
+        f"https://api.github.com/repos/{GITHUB_REPO}/actions/runs/{run_id}/jobs",
+        headers=headers
+    )
+
+    if jobs_response.status_code != 200:
+        return jsonify({"error": jobs_response.json()}), jobs_response.status_code
+
+    jobs = jobs_response.json().get("jobs", [])
+    if not jobs:
+        return jsonify({"status": "not_found"})
+
+    steps = jobs[0].get("steps", [])
+    completed_steps = sum(1 for step in steps if step["status"] == "completed")
+    total_steps = len(steps)
+
+    current_step = None
+    for step in steps:
+        if step["status"] != "completed":
+            current_step = step["name"]
+            break
+
+    return jsonify({
+        "total_steps": total_steps,
+        "completed_steps": completed_steps,
+        "current_step": current_step,
+        "status": latest_run["status"]
+    })
 
 @app.route('/')
 def home():

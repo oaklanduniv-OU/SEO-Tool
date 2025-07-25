@@ -71,12 +71,12 @@ def get_index_html_count_with_expiration(reports_root):
         cached_time, cached_result = cache[reports_root]
         if current_time - cached_time < CACHE_EXPIRATION_TIME:
             return cached_result  # Return the cached result if it's still valid
-
+    
     # If no valid cache, recalculate the count
     total = 0
     for root, _, files in os.walk(reports_root):
         total += files.count("index.html")
-
+    
     # Cache the result with the current timestamp
     cache[reports_root] = (current_time, total)
     return total
@@ -87,6 +87,7 @@ def get_index_html_count_with_expiration(reports_root):
 @api.route('/api/average-scores/<path:subpath>/<int:page>')
 def get_average_scores(subpath, page):
     report_dir = os.path.join(app.root_path, 'templates', 'lighthouse_reports')
+
 
     if subpath:
         reports_root = os.path.join(report_dir, subpath.strip('/'))
@@ -187,7 +188,7 @@ def run_script():
     url = request.form.get('url')
 
     if action == 'sitewide_report':
-        success, message = trigger_workflow("manual-reports.yml")
+        success, message = trigger_workflow("manual-reports.yml")  # Your .yml filename
         return jsonify({"message": message}), (200 if success else 500)
 
     elif action == 'section_report':
@@ -205,11 +206,17 @@ def run_script():
     else:
         return jsonify({"message": "Invalid action"}), 400
 
-@app.route('/workflow-status')
-def workflow_status():
+
+
+
+
+# Add this to your existing app.py
+
+@app.route('/workflow-progress')
+def workflow_progress():
     mode = request.args.get('mode')
     value = request.args.get('value')
-    
+
     if not GITHUB_TOKEN:
         return jsonify({"error": "Missing GitHub token"}), 500
 
@@ -220,63 +227,48 @@ def workflow_status():
 
     workflow_name = "manual-reports.yml"
 
-    response = requests.get(
+    # Step 1: Get the latest workflow run
+    run_response = requests.get(
         f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/{workflow_name}/runs",
         headers=headers
     )
 
-    if response.status_code != 200:
-        return jsonify({"error": response.json()}), response.status_code
+    if run_response.status_code != 200:
+        return jsonify({"error": run_response.json()}), run_response.status_code
 
-    runs = response.json().get("workflow_runs", [])
+    runs = run_response.json().get("workflow_runs", [])
     if not runs:
         return jsonify({"status": "not_found"})
 
     latest_run = runs[0]
+    run_id = latest_run["id"]
 
-    # Fetch jobs for this run to get step info
-    jobs_url = latest_run['jobs_url']
-    jobs_resp = requests.get(jobs_url, headers=headers)
-    if jobs_resp.status_code != 200:
-        return jsonify({
-            "status": latest_run["status"],
-            "conclusion": latest_run.get("conclusion"),
-            "html_url": latest_run["html_url"]
-        })
+    # Step 2: Get jobs for this run
+    jobs_response = requests.get(
+        f"https://api.github.com/repos/{GITHUB_REPO}/actions/runs/{run_id}/jobs",
+        headers=headers
+    )
 
-    jobs_data = jobs_resp.json()
-    jobs = jobs_data.get('jobs', [])
-    
-    # Flatten all steps from all jobs into one list
-    all_steps = []
-    for job in jobs:
-        all_steps.extend(job.get('steps', []))
+    if jobs_response.status_code != 200:
+        return jsonify({"error": jobs_response.json()}), jobs_response.status_code
 
-    total_steps = len(all_steps)
-    current_step_index = 0
+    jobs = jobs_response.json().get("jobs", [])
+    if not jobs:
+        return jsonify({"status": "not_found"})
 
-    # Find first incomplete or in-progress step
-    for idx, step in enumerate(all_steps):
-        if step['conclusion'] is None:  # Step is running or pending
-            current_step_index = idx + 1
-            current_step_name = step['name']
-            break
-    else:
-        # If all steps have conclusion, then set current step to total
-        current_step_index = total_steps
-        current_step_name = "Finishing up"
+    # Assume a single job (common with one workflow file)
+    steps = jobs[0].get("steps", [])
+    total_steps = len(steps)
+    completed_steps = sum(1 for step in steps if step["status"] == "completed")
+    current_step = next((step["name"] for step in steps if step["status"] != "completed"), "Complete")
 
     return jsonify({
-        "status": latest_run["status"],  # queued, in_progress, completed
-        "conclusion": latest_run.get("conclusion"),
-        "html_url": latest_run["html_url"],
-        "progress": {
-            "current_step": current_step_index,
-            "total_steps": total_steps,
-            "current_step_name": current_step_name
-        }
+        "status": latest_run["status"],
+        "current_step": current_step,
+        "completed_steps": completed_steps,
+        "total_steps": total_steps,
+        "html_url": latest_run["html_url"]
     })
-
 
 
 @app.route('/')
@@ -289,27 +281,41 @@ def linkchecker():
 
 @app.route('/generate-reports')
 def report_generation():
+     # Path to the lighthouse_reports directory
     report_dir = os.path.join(app.root_path, 'templates', 'lighthouse_reports')
+    
+    # Get a list of level 1 directories (folders only)
     level_1_dirs = [d for d in os.listdir(report_dir) if os.path.isdir(os.path.join(report_dir, d))]
+    
     return render_template('generate-reports/index.html', level_1_dirs=level_1_dirs)
 
 @app.route('/reports/', defaults={'subpath': ''})
 @app.route('/reports/<path:subpath>')
 def serve_report(subpath):
     report_dir = os.path.join(app.root_path, 'templates', 'lighthouse_reports')
+    # Ensure the subpath is stripped of leading/trailing slashes
     subpath = subpath.strip('/')
+    # Now construct the full path
     requested_path = os.path.join(report_dir, subpath)
+    # Check if it's a directory, if so, check for 'index.html'
     if os.path.isdir(requested_path):
         requested_path = os.path.join(requested_path, 'index.html')
     elif not os.path.exists(requested_path):
+        # If it's neither a file nor a valid path, check for index.html
         index_candidate = os.path.join(requested_path, 'index.html')
         if os.path.exists(index_candidate):
             requested_path = index_candidate
         else:
-            return "Not Found", 404
+            return "Not Found", 404  # Or render a 404 template if preferred
+    # Normalize the subpath for serving the file correctly
     subpath = os.path.relpath(requested_path, report_dir)
+    # Normalize path separators (change backslashes to forward slashes)
     subpath = subpath.replace(os.sep, '/')
+
+    # Serve the file
     return send_from_directory(report_dir, subpath)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

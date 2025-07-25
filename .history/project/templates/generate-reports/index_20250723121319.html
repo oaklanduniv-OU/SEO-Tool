@@ -75,12 +75,7 @@
     <button id="run-link-checker-btn" onclick="alert('Link Checker not implemented yet.')">Run Link Checker</button>
   </div>
   <div id="statusMsg" style="margin: 10px 0; font-weight: bold;"></div>
-  <div id="loader" style="display:none;"></div>
-  <div id="progress-container" style="margin: 10px 0; width: 100%; max-width: 600px; height: 25px; background-color: #eee; border-radius: 5px; overflow: hidden; display: none;">
-    <div id="progress-bar" style="height: 100%; width: 0%; background-color: #877148; transition: width 0.4s ease;"></div>
-  </div>
-  <div id="progress-step" style="font-weight: normal; font-size: 0.9em; margin-bottom: 15px;"></div>
-  
+  <div id="loader" style="display:none;"> Generating report... Please wait.</div>
   <script>
     // Function to switch between tabs
     function showTab(tabName) {
@@ -223,9 +218,6 @@
     function pollStatus(mode, value) {
   const statusMsg = document.getElementById("statusMsg");
   const loader = document.getElementById("loader");
-  const progressContainer = document.getElementById("progress-container");
-  const progressBar = document.getElementById("progress-bar");
-  const progressStep = document.getElementById("progress-step");
 
   const interval = setInterval(() => {
     fetch(`/workflow-status?mode=${mode}&value=${encodeURIComponent(value)}`)
@@ -234,50 +226,26 @@
         if (data.status === "completed") {
           clearInterval(interval);
           loader.style.display = "none";
-          progressContainer.style.display = "none";
-          progressBar.style.width = "0%";
-          progressStep.innerText = "";
 
           if (data.conclusion === "success") {
             const reportPath = mode === "section"
               ? `/reports/${value}`
               : `/reports/${new URL(value).pathname.replace(/^\/|\/$/g, '')}`;
 
-            statusMsg.innerHTML = `Report complete! <a href="${reportPath}" style="color:#877148" target="_blank">View report</a>. *Please note new reports may take 1-5 minutes to go live*`;
+            statusMsg.innerHTML = `✅ Report complete. <a href="${reportPath}" target="_blank">View report</a>`;
           } else {
-            statusMsg.innerText = "Report failed.";
+            statusMsg.innerText = "❌ Report failed.";
           }
-        } else if (data.status === "in_progress" || data.status === "queued") {
-          statusMsg.innerText = (data.status === "queued") 
-            ? "Report is in queue..." 
-            : "Report is in progress...";
-
-          // Show progress bar and update it if we have step info
-          console.log("PROGRESS: ", data.progress)
-          console.log("CURRENT: ", data.progress.current_step)
-          console.log("TOTAL: ", data.progress.total_steps)
-          if (data.progress && data.progress.current_step && data.progress.total_steps) {
-            progressContainer.style.display = "block";
-            const percent = (data.progress.current_step / data.progress.total_steps) * 100;
-            console.log(percent)
-            progressBar.style.width = percent + "%";
-            progressStep.innerText = `Step ${data.progress.current_step} of ${data.progress.total_steps}: ${data.progress.current_step_name}`;
-          } else {
-            // Hide progress bar if no progress info yet
-            progressContainer.style.display = "none";
-            progressBar.style.width = "0%";
-            progressStep.innerText = "";
-          }
+        } else if (data.status === "in_progress") {
+          statusMsg.innerText = `⏳ Report is in progress...`;
+        } else if (data.status === "queued") {
+          statusMsg.innerText = `🕓 Report is in queue...`;
         } else {
-          statusMsg.innerText = `No workflow run found yet...`;
-          progressContainer.style.display = "none";
-          progressBar.style.width = "0%";
-          progressStep.innerText = "";
+          statusMsg.innerText = `⚠️ No workflow run found yet...`;
         }
       });
-  }, 5000); // Poll every 5 seconds for smoother updates
+  }, 10000); // poll every 10s
 }
-
 
   </script>
 

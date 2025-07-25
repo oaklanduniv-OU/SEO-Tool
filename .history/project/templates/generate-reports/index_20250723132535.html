@@ -243,7 +243,7 @@
               ? `/reports/${value}`
               : `/reports/${new URL(value).pathname.replace(/^\/|\/$/g, '')}`;
 
-            statusMsg.innerHTML = `Report complete! <a href="${reportPath}" style="color:#877148" target="_blank">View report</a>. *Please note new reports may take 1-5 minutes to go live*`;
+            statusMsg.innerHTML = `Report complete! <a href="${reportPath}" style="color:#877148" target="_blank">View report</a>. Please note new reports may take 1-5 minutes to go live`;
           } else {
             statusMsg.innerText = "Report failed.";
           }
@@ -261,7 +261,7 @@
             const percent = (data.progress.current_step / data.progress.total_steps) * 100;
             console.log(percent)
             progressBar.style.width = percent + "%";
-            progressStep.innerText = `Step ${data.progress.current_step} of ${data.progress.total_steps}: ${data.progress.current_step_name}`;
+            progressBar.innerText = `Step ${data.progress.current_step} of ${data.progress.total_steps}: ${data.progress.current_step_name}`;
           } else {
             // Hide progress bar if no progress info yet
             progressContainer.style.display = "none";

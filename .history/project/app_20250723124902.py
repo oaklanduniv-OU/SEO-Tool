@@ -209,6 +209,41 @@ def run_script():
 def workflow_status():
     mode = request.args.get('mode')
     value = request.args.get('value')
+
+    if not GITHUB_TOKEN:
+        return jsonify({"error": "Missing GitHub token"}), 500
+
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json"
+    }
+
+    workflow_name = "manual-reports.yml"
+
+    response = requests.get(
+        f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/{workflow_name}/runs",
+        headers=headers
+    )
+
+    if response.status_code != 200:
+        return jsonify({"error": response.json()}), response.status_code
+
+    runs = response.json().get("workflow_runs", [])
+
+    if not runs:
+        return jsonify({"status": "not_found"})
+
+    latest_run = runs[0]
+    return jsonify({
+        "status": latest_run["status"],
+        "conclusion": latest_run.get("conclusion"),
+        "html_url": latest_run["html_url"]
+    })
+
+@app.route('/workflow-status')
+def workflow_status():
+    mode = request.args.get('mode')
+    value = request.args.get('value')
     
     if not GITHUB_TOKEN:
         return jsonify({"error": "Missing GitHub token"}), 500
@@ -276,7 +311,6 @@ def workflow_status():
             "current_step_name": current_step_name
         }
     })
-
 
 
 @app.route('/')

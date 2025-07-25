@@ -230,7 +230,7 @@ h1, h2 {
   transition: background-color 0.3s ease;
 }
 .tab.active {
-  background-color: #877148;
+  background-color: #007bff;
   color: white;
 }
 
