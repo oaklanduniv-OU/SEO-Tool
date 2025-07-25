@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # 15 total chunks
+        chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # 15 chunks
 
     steps:
       - name: Checkout repo
@@ -27,15 +27,45 @@ jobs:
             -v ${{ github.workspace }}/project:/app \
             seo-reporter python3 scripts/GenerateSEOReports.py sitewide_report
 
-      - name: Commit and push updated reports
+      - name: Zip chunk report
+        run: |
+          mkdir -p artifacts
+          cd project/static/reports
+          zip -r ../../artifacts/reports-chunk-${{ matrix.chunk }}.zip lighthouse_reports
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-chunk-${{ matrix.chunk }}
+          path: artifacts/reports-chunk-${{ matrix.chunk }}.zip
+
+
+  merge-reports:
+    needs: sitewide-scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download all chunk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-artifacts
+
+      - name: Unzip all reports
+        run: |
+          mkdir -p project/static/reports/lighthouse_reports
+          for zipfile in downloaded-artifacts/**/*.zip; do
+            unzip -o "$zipfile" -d .
+          done
+
+      - name: Commit and push merged reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add project/templates/lighthouse_reports/
-          git commit -m "📊 Weekly sitewide SEO report update [CI]" || echo "No changes to commit"
-          
-          git pull --rebase origin main || echo "Nothing to rebase"
-          git push || echo "Push failed"
+          git add project/static/reports/lighthouse_reports
+          git commit -m "📦 Merged Lighthouse reports from all chunks [CI]" || echo "No changes to commit"
+          git push
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
