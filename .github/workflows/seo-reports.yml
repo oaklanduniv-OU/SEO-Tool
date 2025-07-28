@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # 15 chunks
+        chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
     steps:
       - name: Checkout repo
@@ -27,17 +27,17 @@ jobs:
             -v ${{ github.workspace }}/project:/app \
             seo-reporter python3 scripts/GenerateSEOReports.py sitewide_report
 
-      - name: Zip chunk report
+      - name: Zip reports for artifact (Chunk ${{ matrix.chunk }})
         run: |
           mkdir -p artifacts
-          cd project/static/reports
-          zip -r ../../artifacts/reports-chunk-${{ matrix.chunk }}.zip lighthouse_reports
+          zip -r artifacts/reports-chunk-${{ matrix.chunk }}.zip project/static/reports/lighthouse_reports/
 
-      - name: Upload artifact
+      - name: Upload artifact (Chunk ${{ matrix.chunk }})
         uses: actions/upload-artifact@v4
         with:
           name: reports-chunk-${{ matrix.chunk }}
           path: artifacts/reports-chunk-${{ matrix.chunk }}.zip
+
 
 
   merge-reports:
@@ -52,6 +52,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: downloaded-artifacts
+          merge-multiple: true
 
       - name: Unzip all reports
         run: |
@@ -66,6 +67,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add project/static/reports/lighthouse_reports
           git commit -m "📦 Merged Lighthouse reports from all chunks [CI]" || echo "No changes to commit"
+          git pull --rebase origin main || echo "No changes to rebase"
           git push
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
