@@ -57,6 +57,7 @@ jobs:
       - name: Unzip all reports
         run: |
           mkdir -p project/static/reports/lighthouse_reports
+          shopt -s globstar
           for zipfile in downloaded-artifacts/**/*.zip; do
             unzip -o "$zipfile" -d .
           done
