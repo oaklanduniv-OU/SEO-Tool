@@ -1,0 +1,37 @@
+name: Generate Average Scores JSON
+
+on:
+  workflow_dispatch:  # Manual trigger
+  workflow_run:
+    workflows: ["Generate Sitewide SEO Report", "Manual SEO Report Trigger"]
+    types:
+      - completed
+
+jobs:
+  generate-averages:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build --no-cache -t seo-reporter .
+
+      - name: Generate average-scores.json
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/project:/app \
+            seo-reporter python3 scripts/average_scores.py > project/static/reports/average-scores.json
+
+      - name: Commit and push updated averages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add project/static/reports/average-scores.json
+          git commit -m "♻️ Updated average-scores.json after report changes" || echo "No changes to commit"
+          git pull --rebase origin main || echo "No rebase needed"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
