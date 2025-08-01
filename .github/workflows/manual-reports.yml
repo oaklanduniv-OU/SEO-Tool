@@ -1,5 +1,5 @@
 # .github/workflows/manual-reports.yml
-name: Manual Section/Single Page Reports
+name: Manual SEO Report Trigger
 
 on:
   workflow_dispatch:
