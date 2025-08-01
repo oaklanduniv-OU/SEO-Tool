@@ -31,8 +31,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add static/reports/linkchecker/linkchecker-report.txt
-          git add static/reports/linkchecker/linkchecker-report-BACKUP-*.txt || true
+          git add project/static/reports/linkchecker/linkchecker-report.txt
+          git add project/static/reports/linkchecker/linkchecker-report-BACKUP-*.txt || true
           git commit -m "🔗 LinkChecker report updated [CI]" || echo "No changes to commit"
           git push
         env:
