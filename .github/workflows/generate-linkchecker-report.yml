@@ -2,7 +2,7 @@ name: Run Link Checker Report
 
 on:
   schedule:
-    - cron: '0 10 * * *'  # Runs every day at 10:00 UTC (adjust as needed)
+    - cron: '0 05 * * *'  # Runs every day at 5:00 UTC (adjust as needed)
   workflow_dispatch:      # Allow manual triggering
 
 jobs:
