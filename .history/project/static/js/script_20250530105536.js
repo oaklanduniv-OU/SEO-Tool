@@ -84,49 +84,54 @@ function generateReport(data, sortBy = "count", showPageLevel = "level-all") {
       break;
   }
 
-  let advFilteredArray = [];
+  var advFilteredArray = []
   switch (showPageLevel) {
     case "level-1":
+
       groupedArray.forEach(([parentUrl, children]) => {
         if (getUrlLevel(parentUrl) === 1) {
-          advFilteredArray.push([parentUrl, children]);
+          advFilteredArray.push([parentUrl, children])
+          
         }
       });
       break;
-
+  
     case "level-2":
+
       groupedArray.forEach(([parentUrl, children]) => {
         if (getUrlLevel(parentUrl) === 2) {
-          advFilteredArray.push([parentUrl, children]);
+          advFilteredArray.push([parentUrl, children])
+          
         }
       });
       break;
-
+  
     case "level-3":
+
       groupedArray.forEach(([parentUrl, children]) => {
         if (getUrlLevel(parentUrl) >= 3) {
-          advFilteredArray.push([parentUrl, children]);
+          advFilteredArray.push([parentUrl, children])
+    
         }
       });
       break;
-
+  
     case "level-all":
     default:
-      advFilteredArray = groupedArray;
+
+      advFilteredArray = groupedArray
       break;
   }
 
   let totalLinks = 0;
 
   advFilteredArray.forEach(([parentUrl, links]) => {
-    // Count only broken links here
-    const brokenCount = links.filter(link => link.status === "broken").length;
-    totalLinks += brokenCount;
+    totalLinks += links.length;
 
     const wrapper = document.createElement("details");
     wrapper.className = "link-item grouped";
     const summary = document.createElement("summary");
-    summary.innerHTML = `<span class="link-url">${parentUrl}</span> <span class="status-label">Broken Links: ${brokenCount}</span>`;
+    summary.innerHTML = `<span class="link-url">${parentUrl}</span> <span class="status-label">Total Links: ${links.length}</span>`;
     wrapper.appendChild(summary);
 
     const detailContent = document.createElement("div");
@@ -137,7 +142,6 @@ function generateReport(data, sortBy = "count", showPageLevel = "level-all") {
       block.classList.add("child-link");
       block.dataset.url = link.url;  // Set data-url
       block.dataset.realUrl = link.realUrl;  // Set data-real-url
-      block.dataset.status = link.status; // <-- Add status for filtering counts
 
       block.innerHTML = ` 
         <p><strong>URL:</strong> <a href="${link.url}" target="_blank">${link.url}</a></p>
@@ -153,16 +157,14 @@ function generateReport(data, sortBy = "count", showPageLevel = "level-all") {
     linkList.appendChild(wrapper);
   });
 
-  // Update total link count (broken links only)
+  // Update total link count
+  console.log(totalLinks)
   updateLinkCounts(totalLinks);
 }
 
 function updateLinkCounts(totalLinks) {
-  // Update only the total broken link count in your page
-  const el = document.getElementById("total-count");
-  if (el) {
-    el.textContent = totalLinks;
-  }
+  // Update only the total link count
+  document.getElementById("total-count").textContent = totalLinks;
 }
 
 function setupSearchFilters() {
@@ -178,14 +180,13 @@ function setupSearchFilters() {
 
     const parentGroups = document.querySelectorAll(".link-item");
 
-    let totalBrokenLinks = 0;
+    let totalLinks = 0;
 
     parentGroups.forEach(group => {
       const summaryText = group.querySelector("summary")?.innerText.toLowerCase() || "";
       const parentMatches = parentQuery ? summaryText.includes(parentQuery) : true;  // Parent match condition
 
       let anyVisible = false;
-
       const childLinks = group.querySelectorAll(".child-link");
 
       childLinks.forEach(child => {
@@ -199,21 +200,14 @@ function setupSearchFilters() {
 
         child.style.display = matches ? "block" : "none";
         if (matches) anyVisible = true;
+        group.style.display = anyVisible ? "block" : "none";
+      if (anyVisible) totalLinks++;
       });
 
-      group.style.display = anyVisible ? "block" : "none";
-
-      // Count broken visible links inside this group
-      if (anyVisible) {
-        childLinks.forEach(child => {
-          if (child.style.display !== "none" && child.dataset.status === "broken") {
-            totalBrokenLinks++;
-          }
-        });
-      }
+      
     });
 
-    updateLinkCounts(totalBrokenLinks);
+    updateLinkCounts(totalLinks);
   };
 
   // Button and Enter key listeners
@@ -232,12 +226,7 @@ function setupSearchFilters() {
     const parentGroups = document.querySelectorAll(".link-item");
     parentGroups.forEach(g => g.style.display = "block");
 
-    const childLinks = document.querySelectorAll(".child-link");
-    childLinks.forEach(c => (c.style.display = "block"));
-
-    // Reset broken links count from parsedData
-    const totalBroken = parsedData.filter(link => link.status === "broken").length;
-    updateLinkCounts(totalBroken);
+    updateLinkCounts(parsedData.length-2);  // Reset to total links count
   });
 }
 
@@ -250,17 +239,23 @@ document.addEventListener("DOMContentLoaded", () => {
     generateReport(parsedData, e.target.value, pageLevelSelect.value);
   });
 
+  
   pageLevelSelect.addEventListener("change", (e) => {
+    console.log(sortSelect.value)
     generateReport(parsedData, sortSelect.value, e.target.value);
   });
 
   setupSearchFilters();
-
-  if (SourceURLParam != null) {
-    document.getElementById("search-parent").value = SourceURLParam;
-    let searchButton = document.getElementById("search-btn");
+  if(SourceURLParam != null){
+    document.getElementById("search-parent").value = SourceURLParam
+    let searchButton = document.getElementById("search-btn")
     setTimeout(() => {
       searchButton.click();
-    }, 100); // Ensure event listeners ready
+    }, 100); // Can be 0, but 100ms ensures event listeners are ready
+  
   }
 });
+
+
+
+
