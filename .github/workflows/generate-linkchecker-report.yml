@@ -1,0 +1,39 @@
+name: Run Link Checker Report
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Runs every day at 10:00 UTC (adjust as needed)
+  workflow_dispatch:      # Allow manual triggering
+
+jobs:
+  run-link-checker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install LinkChecker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y linkchecker
+
+      - name: Run Link Checker Python script
+        run: |
+          python3 scripts/runLinkChecker.py
+
+      - name: Commit and push latest report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/reports/linkchecker/linkchecker-report.txt
+          git add static/reports/linkchecker/linkchecker-report-BACKUP-*.txt || true
+          git commit -m "🔗 LinkChecker report updated [CI]" || echo "No changes to commit"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
