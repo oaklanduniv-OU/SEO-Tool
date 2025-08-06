@@ -146,11 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await fetchAndParseReport(lcSection, true);
 const brokenLinks = data.filter(link => link.status === "broken");
-const forbiddenLinks = data.filter(link => link.status === "403");
 const totalBroken = brokenLinks.length;
-
-console.log("Broken:", brokenLinks.length);
-console.log("403s:", forbiddenLinks.length);
 let lcScore;
 let blTitle = "broken links: " + totalBroken;
 
@@ -340,14 +336,7 @@ scoresRow.appendChild(createGauge(blTitle, lcScore.toFixed(2), "/#"));
 requestIdleCallback(() => {
     AverageGauges();
 });
-function normalizeUrl(url) {
-  return url
-    .toLowerCase()
-    .replace(/^https?:\/\//, "")           // remove http/https
-    .replace(/^www\./, "")                 // remove leading www.
-    .replace(/\/index\.html$/, "")         // remove index.html
-    .replace(/\/+$/, "") + "/";            // ensure single trailing slash
-}
+    
 
     // Helper function to check if it's the homepage
     function isHomepage() {
@@ -376,20 +365,11 @@ function normalizeUrl(url) {
           const resultValid = /Result\s+Valid/i.test(block);
           const resultOk = /Result\s+OK/i.test(block);
       
-          let status;
-if (resultError) {
-  if (resultError.includes("403")) {
-    status = "403";
-  } else if (resultError.includes("401")) {
-    status = "401";
-  } else {
-    status = "broken";
-  }
-} else if (resultValid || resultOk) {
-  status = "valid";
-} else {
-  status = "unknown";
-}
+          const status = resultError
+            ? "broken"
+            : resultValid || resultOk
+            ? "valid"
+            : "unknown";
       
           const message = resultError
             ? resultError
@@ -427,15 +407,11 @@ if (resultError) {
         } else {
           // Return all links under this section (including subpages)
           let combinedLinks = [];
-          const normalizedCombineURL = normalizeUrl(combineURL);
-
-for (let key in grouped) {
-  const normalizedKey = normalizeUrl(key);
-  if (normalizedKey.startsWith(normalizedCombineURL)) {
-    combinedLinks = combinedLinks.concat(grouped[key]);
-  }
-
-}
+          for (let key in grouped) {
+            if (key.startsWith(combineURL)) {
+              combinedLinks = combinedLinks.concat(grouped[key]);
+            }
+          }
           return combinedLinks;
         }
       }

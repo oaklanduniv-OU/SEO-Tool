@@ -340,14 +340,7 @@ scoresRow.appendChild(createGauge(blTitle, lcScore.toFixed(2), "/#"));
 requestIdleCallback(() => {
     AverageGauges();
 });
-function normalizeUrl(url) {
-  return url
-    .toLowerCase()
-    .replace(/^https?:\/\//, "")           // remove http/https
-    .replace(/^www\./, "")                 // remove leading www.
-    .replace(/\/index\.html$/, "")         // remove index.html
-    .replace(/\/+$/, "") + "/";            // ensure single trailing slash
-}
+    
 
     // Helper function to check if it's the homepage
     function isHomepage() {
@@ -427,15 +420,11 @@ if (resultError) {
         } else {
           // Return all links under this section (including subpages)
           let combinedLinks = [];
-          const normalizedCombineURL = normalizeUrl(combineURL);
-
-for (let key in grouped) {
-  const normalizedKey = normalizeUrl(key);
-  if (normalizedKey.startsWith(normalizedCombineURL)) {
-    combinedLinks = combinedLinks.concat(grouped[key]);
-  }
-
-}
+          for (let key in grouped) {
+            if (key.startsWith(combineURL)) {
+              combinedLinks = combinedLinks.concat(grouped[key]);
+            }
+          }
           return combinedLinks;
         }
       }
