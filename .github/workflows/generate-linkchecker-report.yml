@@ -22,6 +22,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y linkchecker
+          
+      - name: Update CA Certificates
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates
 
       - name: Run Link Checker Python script
         run: |
