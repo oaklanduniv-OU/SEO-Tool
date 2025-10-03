@@ -156,7 +156,7 @@ def get_average_scores(subpath, page):
 app.register_blueprint(api)
 
 
-GITHUB_REPO = "arkomeshak-OU/SEO-Tool"  # <-- Replace with your actual GitHub repo
+GITHUB_REPO = "oaklanduniv-OU/SEO-Tool"  # <-- Replace with your actual GitHub repo
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # From Render's env variables
 GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows"
 
