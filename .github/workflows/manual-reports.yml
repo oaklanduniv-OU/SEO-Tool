@@ -33,7 +33,7 @@ jobs:
 
       - name: Configure git for push
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/arkomeshak-OU/SEO-Tool.git
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/oaklanduniv-OU/SEO-Tool.git
 
       - name: Commit and push updated reports
         run: |
